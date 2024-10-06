@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+    //////////////////////////////////////////////////// CSS /////////////////////////////////////////////////////////////
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1, h2, h3 {
+      color: #333;
+      margin: 0;
+    }
+
+    .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start; /* Align items to the top */
+      padding: 20px;
+    }
+
+    .sender, .receiver {
+      width: 45%; /* Adjust width to fit within the container */
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+
+    .form-container {
+      margin-top:30px;
+      border: 1px solid #ddd;
+      padding: 20px;
+      border-radius: 8px;
+      background-color: #fafafa;
+    }
+
+    .form-container label {
+      display: block;
+      margin: 10px 0 5px;
+    }
+
+    .form-container input[type="text"],
+    .form-container textarea,
+    .form-container select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    .form-container input[type="button"] {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+
+    .form-container input[type="button"]:hover {
+      background-color: #45a049;
+    }
+
+    .submitted-email {
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin-top: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      background-color: #fff;
+    }
+
+    .submitted-email.once-view {
+      background-color: #f9d6d6; /* Light red for once-view */
+    }
+
+    .email-header {
+      font-weight: bold;
+      margin-bottom: 5px;
+      font-size: 14px;
+    }
+
+    .email-details {
+      display: none; 
+      margin-top: 10px;
+      border-top: 1px solid #ccc;
+      padding-top: 10px;
+      font-size: 13px;
+    }
+
+    .email-format {
+      font-family: Arial, sans-serif;
+    }
+
+    .email-from,
+    .email-to,
+    .email-subject,
+    .email-body {
+      margin: 5px 0;
+    }
+
+    .readonly {
+      background-color: #f0f0f0;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+    }
+
+    .close-button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background-color: red; /* Red color for close button */
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .close-button:hover {
+      background-color: white;
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="sender">
+      <h2>Sender:</h2>
+      <h3>GoogleHackathon@gmail.com</h3>
+      <div class="form-container">
+        <form id="inputEmail">
+          <label for="recipient">Recipient:</label>
+          <input type="text" id="recipient" name="recipient" value="CodeError@gmail.com" readonly class="readonly">
+          <label for="subject">Subject:</label>
+          <input type="text" id="subject" name="subject" required>
+          <label for="message">Message:</label>
+          <textarea id="message" name="message" rows="4" cols="50" required></textarea>
+          <label for="viewType">Email Type:</label>
+          <select id="viewType" name="viewType">
+            <option value="regular">Regular</option>
+            <option value="once-view">Once-View</option>
+          </select>
+          <input type="button" value="Send" onclick="submitForm()">
+        </form>
+      </div>
+    </div>
+    
+
+    <div class="receiver">
+      <h2>Receiver:</h2>
+      <h3>CodeError@gmail.com</h3>
+      <div id="emailList"></div>
+    </div>
+  </div>
+
+  <script>
+
+  ////////////////////////////////////////////////////Script//////////////////////////////////////////////////////////////
+
+    function submitForm() 
+    {
+      var recipient = document.getElementById('recipient').value; // constant recipient "CodeError@gmail.com"
+      var subject = document.getElementById('subject').value;
+      var message = document.getElementById('message').value;
+      var viewType = document.getElementById('viewType').value;
+
+
+      if (subject.trim() !== "" && message.trim() !== "") 
+      {
+        var emailContainer = document.createElement('div'); //email container
+        emailContainer.className = 'submitted-email ' + (viewType === 'once-view' ? 'once-view' : 'regular');
+        emailContainer.dataset.viewType = viewType; // store the view type
+        emailContainer.dataset.clicked = 'false'; // check if user has clicked for once-view
+
+        var emailHeader = document.createElement('div'); // email header
+        emailHeader.className = 'email-header';
+        emailHeader.textContent = 'GoogleHackathon@gmail.com     ||'+ subject;
+        emailContainer.appendChild(emailHeader);
+
+        var emailDetails = document.createElement('div'); // email details
+        emailDetails.className = 'email-details email-format';
+
+        var emailFrom = document.createElement('p');
+        emailFrom.className = 'email-from';
+        emailFrom.textContent = 'From: GoogleHackathon@gmail.com';
+        emailDetails.appendChild(emailFrom);
+
+        var emailTo = document.createElement('p');
+        emailTo.className = 'email-to';
+        emailTo.textContent = 'To: CodeError@gmail.com';
+        emailDetails.appendChild(emailTo);
+
+        var emailSubject = document.createElement('p');
+        emailSubject.className = 'email-subject';
+        emailSubject.textContent = 'Subject: ' + subject;
+        emailDetails.appendChild(emailSubject);
+
+        var emailMessage = document.createElement('p');
+        emailMessage.className = 'email-body';
+        emailMessage.textContent = 'Message: ' + message;
+        emailDetails.appendChild(emailMessage);
+
+        if (viewType === 'once-view') // add a close button to once-view email
+        {   
+          var closeButton = document.createElement('button');
+          closeButton.className = 'close-button';
+          closeButton.textContent = 'Close';
+          closeButton.onclick = function(event) 
+          {
+            emailDetails.style.display = 'none';
+            emailHeader.style.display = 'none';
+            emailContainer.dataset.clicked = 'true';
+            emailContainer.style.cursor = 'default'; 
+            event.stopPropagation();
+          };
+          emailDetails.appendChild(closeButton);
+        }
+
+        emailContainer.appendChild(emailDetails);
+
+        emailContainer.onclick = function() 
+        {
+          var details = this.querySelector('.email-details');
+          var header = this.querySelector('.email-header');
+          if (this.dataset.viewType === 'regular') 
+          {
+            if (details.style.display === 'none') 
+            {
+              details.style.display = 'block';
+              header.style.display = 'none'; 
+            } else 
+            {
+              details.style.display = 'none';
+              header.style.display = 'block'; 
+            }
+          } else if (this.dataset.viewType === 'once-view') 
+          {
+            if (this.dataset.clicked === 'false') 
+            {
+              details.style.display = 'block';
+              header.style.display = 'none'; 
+              this.dataset.clicked = 'true'; 
+              this.style.cursor = 'default'; 
+            }
+          }
+        };
+
+        var emailList = document.getElementById('emailList');
+        emailList.appendChild(emailContainer);
+
+        
+        document.getElementById('subject').value = '';     // clear the input fields after submission
+        document.getElementById('message').value = '';
+      }
+      else
+      {
+        alert("Please fill in all required fields.");      //window pop out to alert user to fill in require information
+      }
+    }
+  </script>
+</body>
+</html>
